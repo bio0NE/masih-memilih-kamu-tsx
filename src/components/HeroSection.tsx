@@ -1,9 +1,29 @@
 
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import "./HeroSection.css";
 
 export default function HeroSection() {
   const heroRef = useRef<HTMLElement>(null);
+  const musicAudioRef = useRef<HTMLAudioElement>(null);
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const [musicError, setMusicError] = useState(false);
+
+  const toggleMusic = async () => {
+    const audio = musicAudioRef.current;
+    if (!audio) return;
+
+    if (audio.paused) {
+      try {
+        await audio.play();
+        setMusicError(false);
+      } catch {
+        setMusicPlaying(false);
+        setMusicError(true);
+      }
+    } else {
+      audio.pause();
+    }
+  };
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -114,6 +134,42 @@ export default function HeroSection() {
         <p className="hero-copy">
           Jangan biarkan luka-luka kita menjadi alasan untuk menjauh. Aku ingin kita tetap bersama, bukan karena takut kehilangan waktu yang sudah lewat, tapi karena kita sama-sama memilihnya.
         </p>
+      </div>
+
+      <div className="hero-music">
+        <audio
+          ref={musicAudioRef}
+          className="hero-music-audio"
+          src="/Feelings.mp3"
+          preload="none"
+          onPlay={() => {
+            setMusicPlaying(true);
+            setMusicError(false);
+          }}
+          onPause={() => setMusicPlaying(false)}
+          onEnded={() => setMusicPlaying(false)}
+          onError={() => {
+            setMusicPlaying(false);
+            setMusicError(true);
+          }}
+        />
+        <button
+          className="hero-music-toggle"
+          type="button"
+          onClick={toggleMusic}
+          aria-pressed={musicPlaying}
+          aria-describedby={musicError ? "hero-music-error" : undefined}
+        >
+          <span className="hero-music-icon" aria-hidden="true">
+            {musicPlaying ? "Ⅱ" : "▶"}
+          </span>
+          <span>{musicPlaying ? "Jeda musik" : "Putar musik"}</span>
+        </button>
+        {musicError && (
+          <p className="hero-music-error" id="hero-music-error" role="status">
+            Musik tidak dapat diputar. Pastikan Feelings.mp3 tersedia.
+          </p>
+        )}
       </div>
 
       <a
