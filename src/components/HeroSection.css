@@ -125,3 +125,10 @@
     opacity: 0.15;
   }
 }
+
+/* Mobile: shift background image to the right */
+@media (max-width: 768px) {
+  .hero-background {
+    background-position: right center;
+  }
+}
